@@ -4,15 +4,13 @@
 
 Overview
 ---
-This repository contains starting files for the Behavioral Cloning Project.
 
-In this project, you will use what you've learned about deep neural networks and convolutional neural networks to clone driving behavior. You will train, validate and test a model using Keras. The model will output a steering angle to an autonomous vehicle.
 
-We have provided a simulator where you can steer a car around a track for data collection. You'll use image data and steering angles to train a neural network and then use this model to drive the car autonomously around the track.
+In this project, I design, train, and test a convolutional neural network (CNN) to clone the driving behavior from sample images recorded from [Udacity's driving simulator](https://github.com/udacity/self-driving-car-sim). The code for this project can be found at this repository.
 
-We also want you to create a detailed writeup of the project. Check out the [writeup template](https://github.com/udacity/CarND-Behavioral-Cloning-P3/blob/master/writeup_template.md) for this project and use it as a starting point for creating your own writeup. The writeup can be either a markdown file or a pdf document.
+The goals / steps of this project are the following: Use the simulator to collect data of good driving behavior Build, a convolution neural network (using Keras) that predicts steering angles from images Train and validate the model with a training and validation set Test that the model successfully drives around the track without leaving the road
 
-# **Behavioral Cloning** 
+The CNN that was eventually used was based on [NVIDIA's End to End Learning for Self-Driving Cars](https://arxiv.org/pdf/1604.07316v1.pdf) paper with different input image size and with dropout added to improve robustness.
 
 ## Project Report
 
@@ -36,15 +34,43 @@ My project submission includes the following files:
 
 All these files can be found in my project [repository on GitHub (TO DO)](http://www.google.com).
 
-### 2. Quality of Code
+### Installation & Resources
+* Anaconda Python 3.5
+* Udacity [Carnd-term1 starter kit](https://github.com/udacity/CarND-Term1-Starter-Kit) with miniconda installation
+* Udacity [Car Simulation](https://github.com/udacity/self-driving-car-sim) on MacOC
+* Udacity [sample data](https://d17h27t6h515a5.cloudfront.net/topher/2016/December/584f6edd_data/data.zip)
 
-Originally, all of development for this project I did in Jupyter Notebook, because it is very easy to use in a trial-and-error setting. Before submitting the project, I took all the code from the notebook and put it into a file and named it ```model.py```.
+### Quickstart
 
-I split all the functionality used in this project into separate functions and defined them, providing a brief description of what each function does.
+* Two driving modes:
 
-Even though the size of raw data is small enought to be stored in RAM on most modern computers, data augmentation techniques can quickly bloat really fast and make a computer slow. This happened to me in the early stages of this project. I quickly realized that this is not a good way to approach this problem and decided to use a generator to sequentially feed data in batches to the model. I made a generator that preprocesses and augments data in real time during training. This approach allows to use for training even large data sets that cannot comfortably fit into memory.
+Training: For user to take control over the car
+Autonomous: For car to drive by itself
 
-### 3. Model Architecture and Training Strategy
+* Collecting data: User drives on track 1 and collects data by recording the driving experience by toggle ON/OFF the recorder. Data is saved as frame images and a driving log which shows the location of the images, steering angle, throttle, speed, etc. Another option is trying on Udacity data sample.
+
+Approach
+---
+
+To have any idea to start this project, End to End Learning for Self-Driving Cars by Nvidia is a great place to start. From the paper, data collection is the first important part. Per project requirement, data collection can only performed on Track 1. I drove about 4 laps around Track 1 by keyboard control to collect data. The driving wasn't extrememly smooth as actual driving. So I decided to use Udacity sample data as starting point.
+
+Understanding Data
+There are 3 cameras on the car which shows left, center and right images for each steering angle.
+
+views_plot
+
+After recording and save data, the simulator saves all the frame images in IMG folder and produces a driving_log.csv file which containts all the information needed for data preparation such as path to images folder, steering angle at each frame, throttle, brake and speed values.
+
+driving_log
+
+In this project, we only need to predict steering angle. So we will ignore throttle, brake and speed information.
+
+Training and Validation
+Central images and steering angles are shuffle and split into 90/10 for Training/Validation using shuffle & train_test_split from sklearn
+
+Training data is then divided into 3 lists, driving straight, driving left, driving right which are determined by thresholds of angle limit. Any angle > 0.15 is turning right, any angle < -0.15 is turning left, anything around 0 or near 0 is driving straight.
+
+### Model Architecture and Training Strategy
 
 Before starting coding the model, I decided to do some research and read about architectures used by other people. I quckly noticed, that nVidia's model was really popular. It was also relatively simple and not very expensive to train. So I started with that model. The model has:
 
@@ -54,7 +80,7 @@ Before starting coding the model, I decided to do some research and read about a
 3. Three fully connected layers (with 100, 50 and 10 neurons, correspondingly), followed by
 4. Output layer with one output neuron that controls the steering wheel.
 
-I decided to use ELU (Exponential Linear Unit) activation, because [there is evidence](http://image-net.org/challenges/posters/JKU_EN_RGB_Schwarz_poster.pdf) that it can be slightly better than RELU. I did not notice any significant difference for my model, but it was already training really fast (around 70 seconds for roughly 14000 of images). All of the convolutional layers and all of the dense layers in my model with the exception of the last layer used ELU nonlinearity. 
+I decided to use ELU (Exponential Linear Unit) activation, because [there is evidence](http://image-net.org/challenges/posters/JKU_EN_RGB_Schwarz_poster.pdf) that it can be slightly better than RELU. 
 
 In order to train a model, I used two generators – one for training and one for validation. Validation data generator was used to assess out-of-sample performance. Training generator was performing random data augmentation to improve generalization capabilities of the model, but validation generator was only performing preprocessing without doing any of the augmentation. I will discuss augmentation procedures further below.
 
