@@ -6,22 +6,14 @@ Overview
 ---
 
 
-In this project, I design, train, and test a convolutional neural network (CNN) to clone the driving behavior from sample images recorded from [Udacity's driving simulator](https://github.com/udacity/self-driving-car-sim). The code for this project can be found at this repository.
+In this project, I design, train, and test a convolutional neural network (CNN) to clone the driving behavior from sample images recorded from [Udacity's driving simulator](https://github.com/udacity/self-driving-car-sim). 
 
 The goals / steps of this project are the following: Use the simulator to collect data of good driving behavior Build, a convolution neural network (using Keras) that predicts steering angles from images Train and validate the model with a training and validation set Test that the model successfully drives around the track without leaving the road
 
 The CNN that was eventually used was based on [NVIDIA's End to End Learning for Self-Driving Cars](https://arxiv.org/pdf/1604.07316v1.pdf) paper with different input image size and with dropout added to improve robustness.
 
-## Project Report
 
-[//]: # (Image References)
-
-[arch]: ./images/architecture.png "Model Architecture"
-[hist]: ./images/hist.png "Data Distribution"
-
-[image1]: ./examples/placeholder.png "Model Visualization"
-
-### 1. Submission Files
+### Submission Files
 
 My project submission includes the following files:
 
@@ -32,7 +24,7 @@ My project submission includes the following files:
 * ```report.pdf``` – written report, that you are reading right now. It describes all the important steps done to complete the project.
 * ```video.mp4``` – video of the car, driving autonomously on the basic track.
 
-All these files can be found in my project [repository on GitHub (TO DO)](http://www.google.com).
+All these files can be found in my project [repository on GitHub]
 
 ### Installation & Resources
 * Anaconda Python 3.5
@@ -64,6 +56,7 @@ After recording and save data, the simulator saves all the frame images in IMG f
 driving_log
 
 In this project, we only need to predict steering angle. So we will ignore throttle, brake and speed information.
+
 
 Training and Validation
 Central images and steering angles are shuffle and split into 90/10 for Training/Validation using shuffle & train_test_split from sklearn
