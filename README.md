@@ -12,114 +12,81 @@ We have provided a simulator where you can steer a car around a track for data c
 
 We also want you to create a detailed writeup of the project. Check out the [writeup template](https://github.com/udacity/CarND-Behavioral-Cloning-P3/blob/master/writeup_template.md) for this project and use it as a starting point for creating your own writeup. The writeup can be either a markdown file or a pdf document.
 
-To meet specifications, the project will require submitting five files: 
-* model.py (script used to create and train the model)
-* drive.py (script to drive the car - feel free to modify this file)
-* model.h5 (a trained Keras model)
-* a report writeup file (either markdown or pdf)
-* video.mp4 (a video recording of your vehicle driving autonomously around the track for at least one full lap)
+# **Behavioral Cloning** 
 
-This README file describes how to output the video in the "Details About Files In This Directory" section.
+## Project Report
 
-Creating a Great Writeup
----
-A great writeup should include the [rubric points](https://review.udacity.com/#!/rubrics/432/view) as well as your description of how you addressed each point.  You should include a detailed description of the code used (with line-number references and code snippets where necessary), and links to other supporting documents or external references.  You should include images in your writeup to demonstrate how your code works with examples.  
+[//]: # (Image References)
 
-All that said, please be concise!  We're not looking for you to write a book here, just a brief description of how you passed each rubric point, and references to the relevant code :). 
+[arch]: ./images/architecture.png "Model Architecture"
+[hist]: ./images/hist.png "Data Distribution"
 
-You're not required to use markdown for your writeup.  If you use another method please just submit a pdf of your writeup.
+[image1]: ./examples/placeholder.png "Model Visualization"
 
-The Project
----
-The goals / steps of this project are the following:
-* Use the simulator to collect data of good driving behavior 
-* Design, train and validate a model that predicts a steering angle from image data
-* Use the model to drive the vehicle autonomously around the first track in the simulator. The vehicle should remain on the road for an entire loop around the track.
-* Summarize the results with a written report
+### 1. Submission Files
 
-### Dependencies
-This lab requires:
+My project submission includes the following files:
 
-* [CarND Term1 Starter Kit](https://github.com/udacity/CarND-Term1-Starter-Kit)
+* ```model.py``` – the script used to create and train the final model.
+* ```model.ipynb``` - the notebook used for development
+* ```drive.py``` – the script provided by Udacity that is used to drive the car. I did not modify this script in any way.
+* ```model.h5``` – the saved model file. It can be used with Keras to load and compile the model.
+* ```report.pdf``` – written report, that you are reading right now. It describes all the important steps done to complete the project.
+* ```video.mp4``` – video of the car, driving autonomously on the basic track.
 
-The lab enviroment can be created with CarND Term1 Starter Kit. Click [here](https://github.com/udacity/CarND-Term1-Starter-Kit/blob/master/README.md) for the details.
+All these files can be found in my project [repository on GitHub (TO DO)](http://www.google.com).
 
-The following resources can be found in this github repository:
-* drive.py
-* video.py
-* writeup_template.md
+### 2. Quality of Code
 
-The simulator can be downloaded from the classroom. In the classroom, we have also provided sample data that you can optionally use to help train your model.
+Originally, all of development for this project I did in Jupyter Notebook, because it is very easy to use in a trial-and-error setting. Before submitting the project, I took all the code from the notebook and put it into a file and named it ```model.py```.
 
-## Details About Files In This Directory
+I split all the functionality used in this project into separate functions and defined them, providing a brief description of what each function does.
 
-### `drive.py`
+Even though the size of raw data is small enought to be stored in RAM on most modern computers, data augmentation techniques can quickly bloat really fast and make a computer slow. This happened to me in the early stages of this project. I quickly realized that this is not a good way to approach this problem and decided to use a generator to sequentially feed data in batches to the model. I made a generator that preprocesses and augments data in real time during training. This approach allows to use for training even large data sets that cannot comfortably fit into memory.
 
-Usage of `drive.py` requires you have saved the trained model as an h5 file, i.e. `model.h5`. See the [Keras documentation](https://keras.io/getting-started/faq/#how-can-i-save-a-keras-model) for how to create this file using the following command:
-```sh
-model.save(filepath)
-```
+### 3. Model Architecture and Training Strategy
 
-Once the model has been saved, it can be used with drive.py using this command:
+Before starting coding the model, I decided to do some research and read about architectures used by other people. I quckly noticed, that nVidia's model was really popular. It was also relatively simple and not very expensive to train. So I started with that model. The model has:
 
-```sh
-python drive.py model.h5
-```
+0. Two preprocessing layers, which I will describe later when talking about data.
+1. Three convolutional layers with ```(5,5)``` kernels (24, 26 and 48 kernels per layer, correspondingly) with ```(2,2)``` strides, followed by
+2. Two convolutional layers with ```(3,3)``` kernels (64 kernels per layer) with ```(1,1)``` strides, followed by
+3. Three fully connected layers (with 100, 50 and 10 neurons, correspondingly), followed by
+4. Output layer with one output neuron that controls the steering wheel.
 
-The above command will load the trained model and use the model to make predictions on individual images in real-time and send the predicted angle back to the server via a websocket connection.
+I decided to use ELU (Exponential Linear Unit) activation, because [there is evidence](http://image-net.org/challenges/posters/JKU_EN_RGB_Schwarz_poster.pdf) that it can be slightly better than RELU. I did not notice any significant difference for my model, but it was already training really fast (around 70 seconds for roughly 14000 of images). All of the convolutional layers and all of the dense layers in my model with the exception of the last layer used ELU nonlinearity. 
 
-Note: There is known local system's setting issue with replacing "," with "." when using drive.py. When this happens it can make predicted steering values clipped to max/min values. If this occurs, a known fix for this is to add "export LANG=en_US.utf8" to the bashrc file.
+In order to train a model, I used two generators – one for training and one for validation. Validation data generator was used to assess out-of-sample performance. Training generator was performing random data augmentation to improve generalization capabilities of the model, but validation generator was only performing preprocessing without doing any of the augmentation. I will discuss augmentation procedures further below.
 
-#### Saving a video of the autonomous agent
+Because essentially the model was performing regression, the most appropriate evaluation metric was mean squre error (```'mse'``` in Keras). The only problem with that metric is that it is unclear what it means in the context of driving a car autonomously. This metric, in other words, is not very intuitive. The only rule is the smaller, the better. The optimizer used in the model was an adaptive optimizer Adam with the default parameters.
 
-```sh
-python drive.py model.h5 run1
-```
+When training the model as described in [nVidia paper](https://arxiv.org/abs/1604.07316), I noticed that training error quickly was becoming smaller than validation error, which is the sign of overfitting. To reduce that I introduced dropout layers after each convolutional and each dense layer with the exception of the output layer. After training the model with different values of dropout I stopped at 0.5 for the final model.
 
-The fourth argument, `run1`, is the directory in which to save the images seen by the agent. If the directory already exists, it'll be overwritten.
+The final architecture is presented in the table below.
 
-```sh
-ls run1
+![alt text][arch]
 
-[2017-01-09 16:10:23 EST]  12KiB 2017_01_09_21_10_23_424.jpg
-[2017-01-09 16:10:23 EST]  12KiB 2017_01_09_21_10_23_451.jpg
-[2017-01-09 16:10:23 EST]  12KiB 2017_01_09_21_10_23_477.jpg
-[2017-01-09 16:10:23 EST]  12KiB 2017_01_09_21_10_23_528.jpg
-[2017-01-09 16:10:23 EST]  12KiB 2017_01_09_21_10_23_573.jpg
-[2017-01-09 16:10:23 EST]  12KiB 2017_01_09_21_10_23_618.jpg
-[2017-01-09 16:10:23 EST]  12KiB 2017_01_09_21_10_23_697.jpg
-[2017-01-09 16:10:23 EST]  12KiB 2017_01_09_21_10_23_723.jpg
-[2017-01-09 16:10:23 EST]  12KiB 2017_01_09_21_10_23_749.jpg
-[2017-01-09 16:10:23 EST]  12KiB 2017_01_09_21_10_23_817.jpg
-...
-```
+I must admit that architecture-wise, this project is rather easy, especially with Keras that does all the shape inference for you automatically. The secret sauce in making the car drive itself well is not so much the architecture, but the data.
 
-The image file name is a timestamp of when the image was seen. This information is used by `video.py` to create a chronological video of the agent driving.
+### 4. Data
 
-### `video.py`
+A machine learning model is only as good as the data you put in. This is why data collection and processing is one of the most important parts of a successful machine learning application. In the following part I will address the issues related to data collection, preprocessing and augmentation. They were the key part of achieving good results in simulation.
 
-```sh
-python video.py run1
-```
+#### 4.1 Data Collection
 
-Creates a video based on images found in the `run1` directory. The name of the video will be the name of the directory followed by `'.mp4'`, so, in this case the video will be `run1.mp4`.
+As per Udacity suggestions, I collected two laps of "good smooth driving" in the center of the lane and one lap of "recoveries", where I was placing the car in an undesired position away from the center of the road and then recorded the part when the car steers back to the center.
 
-Optionally, one can specify the FPS (frames per second) of the video:
+An iportant point is using keyboard vs. using controller. Analog controller allows to kee steering angle steady at some arbitrary fixed angle and that improves the quality of the data. I used controller to record laps of smooth driving but it was too cumbersome to record recoveries using controller, so I used keyboard instead.
 
-```sh
-python video.py run1 --fps 48
-```
+#### 4.2 Data Preprocessing
 
-Will run the video at 48 FPS. The default FPS is 60.
 
-#### Why create a video
 
-1. It's been noted the simulator might perform differently based on the hardware. So if your model drives succesfully on your machine it might not on another machine (your reviewer). Saving a video is a solid backup in case this happens.
-2. You could slightly alter the code in `drive.py` and/or `video.py` to create a video of what your model sees after the image is processed (may be helpful for debugging).
+![alt text][hist]
 
-### Tips
-- Please keep in mind that training images are loaded in BGR colorspace using cv2 while drive.py load images in RGB to predict the steering angles.
+### Challenges with the Project
 
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
+Originally I thought that ```steps_per_epoch``` and ```validation_steps``` parameters of ```.fit_generator()``` method require the number of training examples. When I provided numbers of training examples, the training went extremely slow even though I was using a high-end GPU for training. At first, I thought I was hitting the hard drive read bottleneck, because my hard drive is old and slow. I tried to solve this problem by pre-loading all cleaned data into memory and then using that loaded data to pass to train generator and perform augmentation on the fly. I think that sped things up but just a little bit. After some time of frustration I finally realized that I was using ```steps_per_epoch``` and ```validation_steps``` parameters all wrong. I then adjusted the values of these parameters and the training started to be as fast as I expected given the speed of my GPU. I learned my lesson and will never forget what these two parameters mean.
+
+I used generators of Keras before, for example ```flow_from_directory()```, but I have never written my own custom generator. For some reason, I thought that it is too difficult and my level of Python was not advanced enough to write my own generators. I was mistaken and realized that generators are not that difficult. This was a really good practice and not only for Keras. Generators are widely used in Python and now I feel more confident in my ability to use and create them.
 
