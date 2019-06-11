@@ -10,8 +10,6 @@ In this project, I design, train, and test a convolutional neural network (CNN) 
 
 The goals / steps of this project are the following: Use the simulator to collect data of good driving behavior Build, a convolution neural network (using Keras) that predicts steering angles from images Train and validate the model with a training and validation set Test that the model successfully drives around the track without leaving the road
 
-The CNN that was eventually used was based on [NVIDIA's End to End Learning for Self-Driving Cars](https://arxiv.org/pdf/1604.07316v1.pdf) paper with different input image size and with dropout added to improve robustness.
-
 
 ### Submission Files
 
@@ -27,7 +25,7 @@ My project submission includes the following files:
 All these files can be found in my project [repository on GitHub]
 
 ### Installation & Resources
-* Anaconda Python 3.5
+* Anaconda Python 3.7
 * Udacity [Carnd-term1 starter kit](https://github.com/udacity/CarND-Term1-Starter-Kit) with miniconda installation
 * Udacity [Car Simulation](https://github.com/udacity/self-driving-car-sim) on MacOC
 * Udacity [sample data](https://d17h27t6h515a5.cloudfront.net/topher/2016/December/584f6edd_data/data.zip)
@@ -44,12 +42,15 @@ Autonomous: For car to drive by itself
 Approach
 ---
 
-To have any idea to start this project, End to End Learning for Self-Driving Cars by Nvidia is a great place to start. From the paper, data collection is the first important part. Per project requirement, data collection can only performed on Track 1. I drove about 4 laps around Track 1 by keyboard control to collect data. The driving wasn't extrememly smooth as actual driving. So I decided to use Udacity sample data as starting point.
+To have any idea to start this project, the CNN that was eventually used was based on [NVIDIA's End to End Learning for Self-Driving Cars](https://arxiv.org/pdf/1604.07316v1.pdf) paper with different input image size and with dropout added to improve robustness. From the paper, data collection is the first important part. Per project requirement, data collection can only performed on Track 1. I drove about 4 laps around Track 1 by keyboard control to collect data. The driving wasn't extrememly smooth as actual driving. So I decided to use Udacity sample data as starting point.
 
-Understanding Data
+### Understanding Data
 There are 3 cameras on the car which shows left, center and right images for each steering angle.
+<img src="./examples/camera.png">
 
 views_plot
+
+<img src="./examples/data_log.png">
 
 After recording and save data, the simulator saves all the frame images in IMG folder and produces a driving_log.csv file which containts all the information needed for data preparation such as path to images folder, steering angle at each frame, throttle, brake and speed values.
 
@@ -57,15 +58,8 @@ driving_log
 
 In this project, we only need to predict steering angle. So we will ignore throttle, brake and speed information.
 
-
-Training and Validation
-Central images and steering angles are shuffle and split into 90/10 for Training/Validation using shuffle & train_test_split from sklearn
-
-Training data is then divided into 3 lists, driving straight, driving left, driving right which are determined by thresholds of angle limit. Any angle > 0.15 is turning right, any angle < -0.15 is turning left, anything around 0 or near 0 is driving straight.
-
-### Model Architecture and Training Strategy
-
-Before starting coding the model, I decided to do some research and read about architectures used by other people. I quckly noticed, that nVidia's model was really popular. It was also relatively simple and not very expensive to train. So I started with that model. The model has:
+### Model Architecture
+The model has:
 
 0. Two preprocessing layers, which I will describe later when talking about data.
 1. Three convolutional layers with ```(5,5)``` kernels (24, 26 and 48 kernels per layer, correspondingly) with ```(2,2)``` strides, followed by
@@ -75,33 +69,70 @@ Before starting coding the model, I decided to do some research and read about a
 
 I decided to use ELU (Exponential Linear Unit) activation, because [there is evidence](http://image-net.org/challenges/posters/JKU_EN_RGB_Schwarz_poster.pdf) that it can be slightly better than RELU. 
 
-In order to train a model, I used two generators – one for training and one for validation. Validation data generator was used to assess out-of-sample performance. Training generator was performing random data augmentation to improve generalization capabilities of the model, but validation generator was only performing preprocessing without doing any of the augmentation. I will discuss augmentation procedures further below.
+Layer (type)                 Output Shape              Param #   
+=================================================================
+cropping2d_1 (Cropping2D)    (None, 70, 320, 3)        0         
+_________________________________________________________________
+lambda_1 (Lambda)            (None, 70, 320, 3)        0         
+_________________________________________________________________
+conv2d_1 (Conv2D)            (None, 33, 158, 24)       1824      
+_________________________________________________________________
+dropout_1 (Dropout)          (None, 33, 158, 24)       0         
+_________________________________________________________________
+conv2d_2 (Conv2D)            (None, 15, 77, 36)        21636     
+_________________________________________________________________
+dropout_2 (Dropout)          (None, 15, 77, 36)        0         
+_________________________________________________________________
+conv2d_3 (Conv2D)            (None, 6, 37, 48)         43248     
+_________________________________________________________________
+dropout_3 (Dropout)          (None, 6, 37, 48)         0         
+_________________________________________________________________
+conv2d_4 (Conv2D)            (None, 4, 35, 64)         27712     
+_________________________________________________________________
+dropout_4 (Dropout)          (None, 4, 35, 64)         0         
+_________________________________________________________________
+conv2d_5 (Conv2D)            (None, 2, 33, 64)         36928     
+_________________________________________________________________
+dropout_5 (Dropout)          (None, 2, 33, 64)         0         
+_________________________________________________________________
+flatten_1 (Flatten)          (None, 4224)              0         
+_________________________________________________________________
+dense_1 (Dense)              (None, 100)               422500    
+_________________________________________________________________
+dropout_6 (Dropout)          (None, 100)               0         
+_________________________________________________________________
+dense_2 (Dense)              (None, 50)                5050      
+_________________________________________________________________
+dropout_7 (Dropout)          (None, 50)                0         
+_________________________________________________________________
+dense_3 (Dense)              (None, 10)                510       
+_________________________________________________________________
+dense_4 (Dense)              (None, 1)                 11        
+=================================================================
+Total params: 559,419
+Trainable params: 559,419
+Non-trainable params: 0
 
-Because essentially the model was performing regression, the most appropriate evaluation metric was mean squre error (```'mse'``` in Keras). The only problem with that metric is that it is unclear what it means in the context of driving a car autonomously. This metric, in other words, is not very intuitive. The only rule is the smaller, the better. The optimizer used in the model was an adaptive optimizer Adam with the default parameters.
+### Training and Validation
+In order to train a model, I used two generators – one for training and one for validation. Validation data generator was used to assess out-of-sample performance. Training generator was performing random data augmentation to improve generalization capabilities of the model, but validation generator was only performing preprocessing without doing any of the augmentation. 
 
-When training the model as described in [nVidia paper](https://arxiv.org/abs/1604.07316), I noticed that training error quickly was becoming smaller than validation error, which is the sign of overfitting. To reduce that I introduced dropout layers after each convolutional and each dense layer with the exception of the output layer. After training the model with different values of dropout I stopped at 0.5 for the final model.
-
-The final architecture is presented in the table below.
-
-![alt text][arch]
-
-I must admit that architecture-wise, this project is rather easy, especially with Keras that does all the shape inference for you automatically. The secret sauce in making the car drive itself well is not so much the architecture, but the data.
-
-### 4. Data
-
-A machine learning model is only as good as the data you put in. This is why data collection and processing is one of the most important parts of a successful machine learning application. In the following part I will address the issues related to data collection, preprocessing and augmentation. They were the key part of achieving good results in simulation.
-
-#### 4.1 Data Collection
-
-As per Udacity suggestions, I collected two laps of "good smooth driving" in the center of the lane and one lap of "recoveries", where I was placing the car in an undesired position away from the center of the road and then recorded the part when the car steers back to the center.
-
-An iportant point is using keyboard vs. using controller. Analog controller allows to kee steering angle steady at some arbitrary fixed angle and that improves the quality of the data. I used controller to record laps of smooth driving but it was too cumbersome to record recoveries using controller, so I used keyboard instead.
-
-#### 4.2 Data Preprocessing
+When training the model as described in NVIDIA paper, I noticed that training error quickly was becoming smaller than validation error, which is the sign of overfitting. To reduce that I introduced dropout layers after each convolutional and each dense layer with the exception of the output layer. After training the model with different values of dropout I stopped at 0.5 for the final model.
 
 
 
-![alt text][hist]
+
+### Data Preprocessing
+
+The secret sauce in making the car drive itself well is not so much the architecture, but the data.
+
+
+Here’s the original distribution of the training data (the x-axis corresponds to steering angles and the y-axis is the data point count for that angle range; Blue bars represent overrepresented classes, removed during data preprocessing step.
+
+<img src="./examples/hist_10.png">
+
+
+<img src="./examples/hist.png">
+
 
 ### Challenges with the Project
 
