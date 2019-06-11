@@ -44,6 +44,8 @@ Approach
 
 To have any idea to start this project, the CNN that was eventually used was based on [NVIDIA's End to End Learning for Self-Driving Cars](https://arxiv.org/pdf/1604.07316v1.pdf) paper with different input image size and with dropout added to improve robustness. From the paper, data collection is the first important part. Per project requirement, data collection can only performed on Track 1. I drove about 4 laps around Track 1 by keyboard control to collect data. The driving wasn't extrememly smooth as actual driving. So I decided to use Udacity sample data as starting point.
 
+<img src="./examples/nVidia_model.png">
+
 ### Understanding Data
 There are 3 cameras on the car which shows left, center and right images for each steering angle.
 <img src="./examples/camera.png">
