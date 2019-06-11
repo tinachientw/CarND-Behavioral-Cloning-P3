@@ -69,49 +69,8 @@ The model has:
 
 I decided to use ELU (Exponential Linear Unit) activation, because [there is evidence](http://image-net.org/challenges/posters/JKU_EN_RGB_Schwarz_poster.pdf) that it can be slightly better than RELU. 
 
-Layer (type)                 Output Shape              Param #   
-=================================================================
-cropping2d_1 (Cropping2D)    (None, 70, 320, 3)        0         
-_________________________________________________________________
-lambda_1 (Lambda)            (None, 70, 320, 3)        0         
-_________________________________________________________________
-conv2d_1 (Conv2D)            (None, 33, 158, 24)       1824      
-_________________________________________________________________
-dropout_1 (Dropout)          (None, 33, 158, 24)       0         
-_________________________________________________________________
-conv2d_2 (Conv2D)            (None, 15, 77, 36)        21636     
-_________________________________________________________________
-dropout_2 (Dropout)          (None, 15, 77, 36)        0         
-_________________________________________________________________
-conv2d_3 (Conv2D)            (None, 6, 37, 48)         43248     
-_________________________________________________________________
-dropout_3 (Dropout)          (None, 6, 37, 48)         0         
-_________________________________________________________________
-conv2d_4 (Conv2D)            (None, 4, 35, 64)         27712     
-_________________________________________________________________
-dropout_4 (Dropout)          (None, 4, 35, 64)         0         
-_________________________________________________________________
-conv2d_5 (Conv2D)            (None, 2, 33, 64)         36928     
-_________________________________________________________________
-dropout_5 (Dropout)          (None, 2, 33, 64)         0         
-_________________________________________________________________
-flatten_1 (Flatten)          (None, 4224)              0         
-_________________________________________________________________
-dense_1 (Dense)              (None, 100)               422500    
-_________________________________________________________________
-dropout_6 (Dropout)          (None, 100)               0         
-_________________________________________________________________
-dense_2 (Dense)              (None, 50)                5050      
-_________________________________________________________________
-dropout_7 (Dropout)          (None, 50)                0         
-_________________________________________________________________
-dense_3 (Dense)              (None, 10)                510       
-_________________________________________________________________
-dense_4 (Dense)              (None, 1)                 11        
-=================================================================
-Total params: 559,419
-Trainable params: 559,419
-Non-trainable params: 0
+<img src="./examples/model.png">
+
 
 ### Training and Validation
 In order to train a model, I used two generators – one for training and one for validation. Validation data generator was used to assess out-of-sample performance. Training generator was performing random data augmentation to improve generalization capabilities of the model, but validation generator was only performing preprocessing without doing any of the augmentation. 
@@ -128,10 +87,12 @@ The secret sauce in making the car drive itself well is not so much the architec
 
 Here’s the original distribution of the training data (the x-axis corresponds to steering angles and the y-axis is the data point count for that angle range; Blue bars represent overrepresented classes, removed during data preprocessing step.
 
-<img src="./examples/hist_10.png">
+<img src="./examples/hist_aug.png">
+<img src="./examples/hist_aug_2.png">
 
 
-<img src="./examples/hist.png">
+<img src="./examples/hist_depth10.png">
+<img src="./examples/hist_depth3.png">
 
 
 ### Challenges with the Project
