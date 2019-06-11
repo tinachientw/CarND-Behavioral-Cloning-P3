@@ -79,20 +79,29 @@ When training the model as described in NVIDIA paper, I noticed that training er
 
 
 
-
 ### Data Preprocessing
 
 The secret sauce in making the car drive itself well is not so much the architecture, but the data.
 
-
-Here’s the original distribution of the training data (the x-axis corresponds to steering angles and the y-axis is the data point count for that angle range; Blue bars represent overrepresented classes, removed during data preprocessing step.
+To achieve a more uniform distribution. I tried augment the data, also reduce the occurrence of low and zero angle data points, 
+But the training time is too long and the car didn't drive smoothly.
 
 <img src="./examples/hist_aug.png">
 <img src="./examples/hist_aug_2.png">
 
-
+So I didn't augment the data, but remove the data to make it more uniform distributed. Again, the car didn't drive very well due to I dropped off too many data. (Here’s the original distribution of the training data (the x-axis corresponds to steering angles and the y-axis is the data point count for that angle range; Blue bars represent overrepresented classes, removed during data preprocessing step.)
 <img src="./examples/hist_depth10.png">
+
+After several try and error, I got a better result by not making the distribution uniformed overall, but make sure it's much closer to uniform for lower and zero turning angles.
 <img src="./examples/hist_depth3.png">
+
+### Test Drive
+
+Track 1: 
+Click on the image to watch the video or click [here](https://youtu.be/ULiEcbUM2io). You will be redirected to YouTube.
+
+[![IMAGE ALT TEXT HERE](./examples/youtube.png)](https://youtu.be/ULiEcbUM2io)
+
 
 
 ### Challenges with the Project
