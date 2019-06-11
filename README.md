@@ -108,14 +108,13 @@ Click on the image to watch the video or click [here](https://youtu.be/ULiEcbUM2
 
 ### Challenges with the Project
 
-Data:
+* Data:
 I am not good at playing video games, also my driving skill is very bad. Therefore, it's imposible for me to get the good data from simulator. It was the most difficult challenge for me, getting a smooth driving data. Fortunately, I udacity provide the sample data. Or I will never able to finish the project.
 
-Training time:
+* Training time:
 I used my local Linux server to train my model, but my GPU was not fast enough. So I could only train the model once or twice per day, which is very frustrated. So I tried Numba, a High Performance Python Compiler, to speed it up and tried not augment the data to reduce the training time.
 
-Data preprocessing
+* Data preprocessing:
 Only very simple data preprocessing steps were taken. It might be beneficial to combine some of the steps that were implemented in the other projects to help, for example, highlight the lane lines more clearly so that the model can use less noisy input data.
 
-I used generators of Keras before, for example ```flow_from_directory()```, but I have never written my own custom generator. For some reason, I thought that it is too difficult and my level of Python was not advanced enough to write my own generators. I was mistaken and realized that generators are not that difficult. This was a really good practice and not only for Keras. Generators are widely used in Python and now I feel more confident in my ability to use and create them.
 
