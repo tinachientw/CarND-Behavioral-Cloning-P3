@@ -90,10 +90,12 @@ But the training time is too long and the car didn't drive smoothly.
 <img src="./examples/hist_aug_2.png">
 
 So I didn't augment the data, but remove the data to make it more uniform distributed. Again, the car didn't drive very well due to I dropped off too many data. (Here’s the original distribution of the training data (the x-axis corresponds to steering angles and the y-axis is the data point count for that angle range; Blue bars represent overrepresented classes, removed during data preprocessing step.)
+
 <img src="./examples/hist_depth10.png">
 
 After several try and error, I got a better result by not making the distribution uniformed overall, but make sure it's much closer to uniform for lower and zero turning angles.
-<img src="./examples/hist_depth3.png">
+
+img src="./examples/hist_depth3.png">
 
 ### Test Drive
 
