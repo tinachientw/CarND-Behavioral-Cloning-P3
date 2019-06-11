@@ -84,7 +84,7 @@ When training the model as described in NVIDIA paper, I noticed that training er
 The secret sauce in making the car drive itself well is not so much the architecture, but the data.
 
 To achieve a more uniform distribution. I tried augment the data, also reduce the occurrence of low and zero angle data points, 
-But the training time is too long and the car didn't drive smoothly.
+But the training time was too long and the car didn't drive smoothly.
 
 <img src="./examples/hist_aug.png">
 <img src="./examples/hist_aug_2.png">
@@ -95,7 +95,7 @@ So I didn't augment the data, but remove the data to make it more uniform distri
 
 After several try and error, I got a better result by not making the distribution uniformed overall, but make sure it's much closer to uniform for lower and zero turning angles.
 
-img src="./examples/hist_depth3.png">
+<img src="./examples/hist_depth3.png">
 
 ### Test Drive
 
@@ -108,7 +108,14 @@ Click on the image to watch the video or click [here](https://youtu.be/ULiEcbUM2
 
 ### Challenges with the Project
 
-Originally I thought that ```steps_per_epoch``` and ```validation_steps``` parameters of ```.fit_generator()``` method require the number of training examples. When I provided numbers of training examples, the training went extremely slow even though I was using a high-end GPU for training. At first, I thought I was hitting the hard drive read bottleneck, because my hard drive is old and slow. I tried to solve this problem by pre-loading all cleaned data into memory and then using that loaded data to pass to train generator and perform augmentation on the fly. I think that sped things up but just a little bit. After some time of frustration I finally realized that I was using ```steps_per_epoch``` and ```validation_steps``` parameters all wrong. I then adjusted the values of these parameters and the training started to be as fast as I expected given the speed of my GPU. I learned my lesson and will never forget what these two parameters mean.
+Data:
+I am not good at playing video games, also my driving skill is very bad. Therefore, it's imposible for me to get the good data from simulator. It was the most difficult challenge for me, getting a smooth driving data. Fortunately, I udacity provide the sample data. Or I will never able to finish the project.
+
+Training time:
+I used my local Linux server to train my model, but my GPU was not fast enough. So I could only train the model once or twice per day, which is very frustrated. So I tried Numba, a High Performance Python Compiler, to speed it up and tried not augment the data to reduce the training time.
+
+Data preprocessing
+Only very simple data preprocessing steps were taken. It might be beneficial to combine some of the steps that were implemented in the other projects to help, for example, highlight the lane lines more clearly so that the model can use less noisy input data.
 
 I used generators of Keras before, for example ```flow_from_directory()```, but I have never written my own custom generator. For some reason, I thought that it is too difficult and my level of Python was not advanced enough to write my own generators. I was mistaken and realized that generators are not that difficult. This was a really good practice and not only for Keras. Generators are widely used in Python and now I feel more confident in my ability to use and create them.
 
