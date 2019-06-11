@@ -109,7 +109,7 @@ Click on the image to watch the video or click [here](https://youtu.be/ULiEcbUM2
 ### Challenges with the Project
 
 * Data:
-I am not good at playing video games, also my driving skill is very bad. Therefore, it's imposible for me to get the good data from simulator. It was the most difficult challenge for me, getting a smooth driving data. Fortunately, I udacity provide the sample data. Or I will never able to finish the project.
+I am not good at playing video games, also my driving skill is very bad. Therefore, it's imposible for me to get the good data from simulator. It was the most difficult challenge for me, getting a smooth driving data. Fortunately, Udacity provides the sample data. Or I will never able to finish the project.
 
 * Training time:
 I used my local Linux server to train my model, but my GPU was not fast enough. So I could only train the model once or twice per day, which is very frustrated. So I tried Numba, a High Performance Python Compiler, to speed it up and tried not augment the data to reduce the training time.
