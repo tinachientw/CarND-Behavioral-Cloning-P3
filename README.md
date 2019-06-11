@@ -97,7 +97,7 @@ So I didn't augment the data, but remove the data to make it more uniform distri
 
 After several try and error, I got a better result by not making the distribution uniformed overall, but make sure it's much closer to uniform for lower and zero turning angles.
 
-<img src="./examples/hist_depth3.png">
+<img src="./examples/hist_depth_2.png">
 
 ### Test Drive
 
